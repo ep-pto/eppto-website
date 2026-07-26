@@ -21,6 +21,15 @@ is the board roster minus its photo and bio -- there's still only one place
 to edit a board member (the `board` block), and the compact copy on
 contact.html is generated from it automatically, never hand-duplicated.
 
+The `head` block additionally stamps a `?v=<hash>` query string onto
+style.css and script.js, hashed from each file's current contents. This is
+cache-busting: without it, a visitor's browser (or a CDN in front of the
+host) can keep serving an old cached copy of style.css after it's changed,
+since the URL never changed. The hash changes automatically whenever either
+file's content changes, so a normal sync run is enough to make every page
+pick up the new version -- nobody has to remember to bump a version number,
+and nobody visiting the site has to force-refresh.
+
 Usage:
     python3 sync-shared.py            sync every block
     python3 sync-shared.py --check    report what would change, write nothing
@@ -45,6 +54,7 @@ hand-maintain:
        (never the base block's markers -- those still get the full version)
 """
 
+import hashlib
 import re
 import sys
 from collections import namedtuple
@@ -52,22 +62,27 @@ from pathlib import Path
 
 SOURCE = "_blocks.html"
 
-# name:           the block's own marker name, and what pages reference
-# does_active:    set the `active` class per destination page? (nav only)
-# source:         None for a normal block (content comes from its own
-#                 markers in _blocks.html); another block's name to derive
-#                 this one from that block's content instead
-# strip_classes:  when `source` is set, remove every element whose class
-#                 list contains any of these
-Block = namedtuple("Block", "name does_active source strip_classes")
+# name:            the block's own marker name, and what pages reference
+# does_active:     set the `active` class per destination page? (nav only)
+# source:          None for a normal block (content comes from its own
+#                  markers in _blocks.html); another block's name to derive
+#                  this one from that block's content instead
+# strip_classes:   when `source` is set, remove every element whose class
+#                  list contains any of these
+# versions_assets: stamp a content-hash `?v=` query string onto style.css
+#                  and script.js references (head block only) - see
+#                  add_asset_versions() below
+Block = namedtuple("Block", "name does_active source strip_classes versions_assets")
 
 
-def _block(name, does_active=False, source=None, strip_classes=None):
-    return Block(name, does_active, source, strip_classes)
+def _block(
+    name, does_active=False, source=None, strip_classes=None, versions_assets=False
+):
+    return Block(name, does_active, source, strip_classes, versions_assets)
 
 
 BLOCKS = [
-    _block("head"),
+    _block("head", versions_assets=True),
     _block("nav", does_active=True),
     _block("board"),
     _block(
@@ -76,6 +91,10 @@ BLOCKS = [
         strip_classes=["board-photo", "board-photo-placeholder", "board-bio"],
     ),
 ]
+
+# Assets that get a cache-busting ?v=<hash> query string wherever the head
+# block references them by a bare filename (href="style.css", src="script.js").
+VERSIONED_ASSETS = ["style.css", "script.js"]
 
 # When the current page is inside a dropdown, also mark its parent active.
 MARK_PARENT_OF_ACTIVE_CHILD = True
@@ -178,6 +197,30 @@ def strip_elements(html, classes):
     return re.sub(r"\n[ \t]*\n(?:[ \t]*\n)+", "\n\n", "".join(out))
 
 
+def _content_hash(path, length=8):
+    return hashlib.sha256(path.read_bytes()).hexdigest()[:length]
+
+
+def add_asset_versions(html):
+    """Stamp a `?v=<hash>` onto each VERSIONED_ASSETS reference in `html`.
+
+    The hash is computed fresh from the asset's current bytes every time this
+    runs, so it's always correct and never needs updating by hand - editing
+    style.css or script.js and re-running the sync is enough to bust every
+    page's cached copy.
+    """
+    for asset in VERSIONED_ASSETS:
+        path = ROOT / asset
+        if not path.exists():
+            continue
+        version = _content_hash(path)
+        ref_re = re.compile(
+            r'((?:href|src)=")%s(?:\?v=[0-9a-f]+)?(")' % re.escape(asset)
+        )
+        html = ref_re.sub(r"\g<1>%s?v=%s\g<2>" % (asset, version), html)
+    return html
+
+
 def set_active(block_html, page):
     """Return block_html with `active` set only on the link matching `page`."""
 
@@ -258,6 +301,8 @@ def sync_block(block, check_only, source_html):
     template = source_html[span[0] : span[1]]
     if block.strip_classes:
         template = strip_elements(template, block.strip_classes)
+    if block.versions_assets:
+        template = add_asset_versions(template)
     changed, same, skipped = [], [], []
 
     for page in destinations():

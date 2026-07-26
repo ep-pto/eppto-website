@@ -61,10 +61,32 @@ function initNavToggle() {
   });
 }
 
+// Auto-disables a .form-btn once its order/shop window has passed, e.g. a
+// monthly popcorn or Spirit Shop link. Add data-cutoff="YYYY-MM-DDTHH:MM:SS"
+// (local time) to a button to opt it in - update that value alongside the
+// href each time the link changes, and disabling resets itself with it.
+// Buttons with no data-cutoff (like the evergreen spirit wear link) are
+// left alone.
+function initDatedButtons() {
+  var now = new Date();
+  document.querySelectorAll('.form-btn[data-cutoff]').forEach(function (btn) {
+    var cutoff = new Date(btn.getAttribute('data-cutoff'));
+    if (isNaN(cutoff) || now < cutoff) return;
+    btn.removeAttribute('href');
+    btn.removeAttribute('target');
+    btn.setAttribute('aria-disabled', 'true');
+    btn.addEventListener('click', function (e) { e.preventDefault(); });
+    var hidden = btn.querySelector('.visually-hidden');
+    if (hidden) hidden.textContent = ' (closed)';
+  });
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initDropdowns);
   document.addEventListener('DOMContentLoaded', initNavToggle);
+  document.addEventListener('DOMContentLoaded', initDatedButtons);
 } else {
   initDropdowns();
   initNavToggle();
+  initDatedButtons();
 }

@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Work+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="style.css?v=a3e47be1">
+  <script src="script.js?v=2209aaf9" defer></script>
   <!-- head:end -->
 </head>
 <body>
@@ -89,14 +89,18 @@
           <li><strong>Subscriptions must be purchased by August 26th.</strong></li>
           <li>After August 26th, students can still get popcorn month-to-month at the regular rate of $1.50/bag, paid through Cheddar Up in the days leading up to each Popcorn Day &mdash; see the non-subscription link below for the current month.</li>
         </ul>
+        <!-- data-cutoff disables this button once the subscription window
+             closes - see initDatedButtons() in script.js. Move it to next
+             year's deadline whenever this button's copy changes. -->
         <p class="btn-row">
-          <a class="form-btn" href="http://my.cheddarup.com/c/eagle-popcorn-express" target="_blank" rel="noopener">Subscribe to Popcorn Express<span class="visually-hidden"> (opens in a new tab)</span></a>
+          <a class="form-btn" href="http://my.cheddarup.com/c/eagle-popcorn-express" data-cutoff="2026-08-27T00:00:00" target="_blank" rel="noopener">Subscribe to Popcorn Express<span class="visually-hidden"> (opens in a new tab)</span></a>
         </p>
         <p class="section-lead">Not subscribing? You can still buy this month&rsquo;s bag one at a time for $1.50 (limit 1 per student). August orders are due August 27th by 10:00 AM.</p>
         <!-- Non-subscription link is monthly, like the Spirit Shop link below -
-             update the href and button label each month. -->
+             update the href, button label, AND data-cutoff each month (the
+             cutoff is what disables the button once the order window closes). -->
         <p class="btn-row">
-          <a class="form-btn" href="http://my.cheddarup.com/c/august-popcorn-sale" target="_blank" rel="noopener">Buy August Popcorn (No Subscription)<span class="visually-hidden"> (opens in a new tab)</span></a>
+          <a class="form-btn" href="http://my.cheddarup.com/c/august-popcorn-sale" data-cutoff="2026-08-27T10:00:00" target="_blank" rel="noopener">Buy August Popcorn (No Subscription)<span class="visually-hidden"> (opens in a new tab)</span></a>
         </p>
       </div>
     </section>
@@ -107,10 +111,11 @@
         <h2>Monthly Spirit Shop</h2>
         <p class="section-lead">Once a month, students can shop the Spirit Shop during lunch &mdash; spirit sticks, bracelets, fidgets, vintage tees, and more. Load a balance online ahead of time and volunteers will call your student up to the table on shop day.</p>
         <p class="section-lead">Only load what you want spent that day &mdash; the shop closes online the morning of, and this link is updated each month for that month&rsquo;s shop.</p>
-        <!-- The link below is the current month's Cheddar Up page - update it
-             (and the button label / month name) each month for the new shop. -->
+        <!-- The link below is the current month's Cheddar Up page - update
+             the href, button label, AND data-cutoff each month for the new
+             shop (data-cutoff is what disables the button once it closes). -->
         <p class="btn-row">
-          <a class="form-btn" href="http://my.cheddarup.com/c/august-spirit-shop" target="_blank" rel="noopener">Load August Spirit Shop Balance<span class="visually-hidden"> (opens in a new tab)</span></a>
+          <a class="form-btn" href="http://my.cheddarup.com/c/august-spirit-shop" data-cutoff="2026-08-28T10:00:00" target="_blank" rel="noopener">Load August Spirit Shop Balance<span class="visually-hidden"> (opens in a new tab)</span></a>
         </p>
       </div>
     </section>

@@ -116,6 +116,27 @@ So a page's `<head>` looks like this, and only the marked part is managed:
 </head>
 ```
 
+### Cache-busting for style.css and script.js
+
+The `head` block stamps a `?v=<hash>` onto `style.css` and `script.js` -
+`href="style.css?v=d8ac98a4"` rather than a bare `href="style.css"`. The hash
+is computed from each file's actual bytes at sync time (`add_asset_versions()`
+in `sync-shared.py`), so it always matches the current content automatically.
+
+This exists because a browser (or any CDN in front of the host) caches a file
+by its URL. If you edit `style.css` in place, the URL never changes, so
+visitors can keep getting the old cached copy until it expires - which looked
+like "the site is broken until you force-refresh" the first time this came up
+(a stale cached stylesheet made an image render huge). Changing the query
+string makes it a new URL from the browser's point of view, so it fetches the
+new content on a normal visit, no force-refresh needed.
+
+**The fix only takes effect once you re-run the sync.** Editing `style.css` or
+`script.js` alone doesn't touch any page - run `python3 sync-shared.py head`
+(or a full `python3 sync-shared.py`) afterward so the new hash goes out.
+`_blocks.html` itself keeps a plain, unversioned `href="style.css"` in its own
+copy of the head block; only the generated copies on real pages get the `?v=`.
+
 ### Commands
 
 ```bash
@@ -257,6 +278,18 @@ The script writes the real content in on the next run.
   resized back past the breakpoint. Dropdowns reuse the same open/close JS as
   desktop touch devices — tapping a parent item expands it inline instead of
   navigating.
+- **Dated buttons.** A `.form-btn` with a `data-cutoff="YYYY-MM-DDTHH:MM:SS"`
+  attribute (local time) auto-disables itself once that time passes —
+  `initDatedButtons()` in `script.js` checks once on page load, and if the
+  button is past its cutoff it strips the `href`/`target`, sets
+  `aria-disabled="true"` (greyed out, inert, "Closed" label via
+  `.form-btn[aria-disabled="true"]::after` in `style.css`), and updates its
+  hidden "(opens in a new tab)" text to "(closed)". Used on `shop.html`'s
+  three time-boxed links (Popcorn Express subscription, the monthly
+  non-subscription popcorn sale, the monthly Spirit Shop balance) — buttons
+  with no `data-cutoff`, like Spirit Wear, are left alone. Update the cutoff
+  alongside the `href` each time one of these monthly links changes; there's
+  nothing else to touch.
 - **The split layout** on the home page stacks below 1024px. Side by side on
   narrower screens squeezed the text to ~28 characters per line.
 - **Typographic apostrophes** (`&rsquo;`) are used in visible text, not `'`.
@@ -283,12 +316,13 @@ The script writes the real content in on the next run.
   `<img class="board-photo">` (uncomment it, add the photo to `img/board/`)
   and replace each "Bio coming soon." once bios are provided
 - `shop.html` has **two links that are not evergreen** — both point to a new
-  Cheddar Up page each month and need their `href` and button label updated
-  every month (each has a reminder comment above it in the HTML):
+  Cheddar Up page each month and need their `href`, button label, and
+  `data-cutoff` updated every month (each has a reminder comment above it in
+  the HTML; see "Dated buttons" above for what `data-cutoff` does):
   - the non-subscription popcorn purchase link (currently `august-popcorn-sale`,
-    "Buy August Popcorn (No Subscription)")
+    "Buy August Popcorn (No Subscription)", cutoff Aug 27 10:00 AM)
   - the Monthly Spirit Shop link (currently `august-spirit-shop`, "Load August
-    Spirit Shop Balance")
+    Spirit Shop Balance", cutoff Aug 28 10:00 AM)
 - Verify dropdown tap behavior and the mobile hamburger nav toggle on a real
   touch device
 

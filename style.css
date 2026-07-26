@@ -408,6 +408,22 @@ main a:focus-visible {
 .banner-cta-link:focus-visible::after, .form-btn:focus-visible::after {
     transform: translateX(4px);
 }
+/* Past-cutoff state, set by initDatedButtons() in script.js. Greyed out and
+   inert; the arrow becomes a "Closed" label since it no longer goes anywhere. */
+.form-btn[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+.form-btn[aria-disabled="true"]:hover,
+.form-btn[aria-disabled="true"]:focus-visible {
+    transform: none;
+    box-shadow: none;
+}
+.form-btn[aria-disabled="true"]::after {
+    content: "Closed";
+    font-size: 0.85rem;
+}
 /* Centers a button within the text column. */
 .btn-row {
     text-align: center;

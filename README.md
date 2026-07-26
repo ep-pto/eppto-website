@@ -19,7 +19,7 @@ no framework, no server needed. Open any `.html` file in a browser to view it.
 | `shop.html` | Popcorn Express subscription, monthly Spirit Shop balance, spirit wear |
 | `contact.html` | Catch-all email, board contacts, other ways to connect |
 | `social.html` | Social media links |
-| `favorites.html` | Teachers' favorite things — its own top-level nav link, not under Documents |
+| `favorites.html` | Teachers' favorite things |
 | `minutes.html` | Meeting minutes (documents) |
 | `budget.html` | Budget (documents) |
 | `bylaws.html` | Bylaws (documents) |
@@ -90,10 +90,6 @@ Block("board-compact", source="board", strip_classes=["board-photo", "board-bio"
 remove. Everything else about it (its own `:start`/`:end` markers on whatever
 page uses it, showing up in `--check`, etc.) works exactly like a normal block.
 
-(There used to be a `cta` "Don't Miss Out" block on every page. It was removed:
-the call-to-action now lives only on the home page as its own section, so it is
-no longer a shared block.)
-
 ### What is *not* in the `head` block
 
 Anything page-specific stays outside the markers, above them in the `<head>`:
@@ -125,11 +121,9 @@ in `sync-shared.py`), so it always matches the current content automatically.
 
 This exists because a browser (or any CDN in front of the host) caches a file
 by its URL. If you edit `style.css` in place, the URL never changes, so
-visitors can keep getting the old cached copy until it expires - which looked
-like "the site is broken until you force-refresh" the first time this came up
-(a stale cached stylesheet made an image render huge). Changing the query
-string makes it a new URL from the browser's point of view, so it fetches the
-new content on a normal visit, no force-refresh needed.
+visitors can keep getting the old cached copy until it expires. Changing the
+query string makes it a new URL from the browser's point of view, so it
+fetches the new content on a normal visit - nobody has to force-refresh.
 
 **The fix only takes effect once you re-run the sync.** Editing `style.css` or
 `script.js` alone doesn't touch any page - run `python3 sync-shared.py head`
@@ -211,12 +205,11 @@ The script writes the real content in on the next run.
 ```
 
 - **One light surface.** The whole site sits on a single off-white background
-  (`--surface`). The `.section-1` / `.section-2` / `.section-3` classes are kept
-  as markup hooks but no longer flood a background color — sections are set apart
-  by whitespace and a short red underline under each `<h2>` (`main h2::after`).
-  This replaced the old alternating grey / navy / red bands, which created a
-  "false bottom": the hard light-to-dark seam read as a footer and stopped
-  people scrolling.
+  (`--surface`). The `.section-1` / `.section-2` / `.section-3` classes are
+  markup hooks only — they don't set a background color. Sections are set
+  apart by whitespace and a short red underline under each `<h2>`
+  (`main h2::after`). Don't reintroduce full-width colored section
+  backgrounds; keep new sections on the same light surface.
 - `.section-inner` caps content at 1100px and centers it.
 - `.section-lead` is the larger intro paragraph.
 - `.bullet-list` is the square-bullet list style.
@@ -260,9 +253,9 @@ The script writes the real content in on the next run.
   the top of `style.css`. Change them there, not at each use site.
 - **Paragraph margins are opt-in.** A bare `p { margin: 0 }` reset (kept
   deliberately at type-selector specificity) zeroes everything; components
-  add back the margins they want. Never raise that reset's specificity —
-  a `.section p` version of it once silently defeated every component's
-  spacing.
+  add back the margins they want. Don't raise that reset's specificity (e.g.
+  to `.section p`) — a higher-specificity version of it will defeat every
+  component's own spacing.
 - **Text measure.** Paragraphs and lists inside `.section-inner` are capped at
   `var(--measure)` (42rem) and centered. This is a fixed unit on purpose:
   `ch` scales with font-size, which made blocks of different sizes misalign.
@@ -325,9 +318,3 @@ The script writes the real content in on the next run.
     Spirit Shop Balance", cutoff Aug 28 10:00 AM)
 - Verify dropdown tap behavior and the mobile hamburger nav toggle on a real
   touch device
-
-The board roster (`_blocks.html`), event dates (`events.html`), meeting
-schedule (`meetings.html`), donate page (`donate.html`), shop page
-(`shop.html`), and teacher favorites (`favorites.html`, 41 staff entries) are
-filled in with real content. Every
-page linked from the nav now exists.

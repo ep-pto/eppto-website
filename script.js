@@ -81,12 +81,21 @@ function initDatedButtons() {
   });
 }
 
+// Keeps the footer's copyright year current without anyone having to edit
+// it every January.
+function initFooterYear() {
+  var el = document.getElementById('footer-year');
+  if (el) el.textContent = new Date().getFullYear();
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initDropdowns);
   document.addEventListener('DOMContentLoaded', initNavToggle);
   document.addEventListener('DOMContentLoaded', initDatedButtons);
+  document.addEventListener('DOMContentLoaded', initFooterYear);
 } else {
   initDropdowns();
   initNavToggle();
   initDatedButtons();
+  initFooterYear();
 }

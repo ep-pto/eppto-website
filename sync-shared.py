@@ -90,6 +90,7 @@ BLOCKS = [
         source="board",
         strip_classes=["board-photo", "board-photo-placeholder", "board-bio"],
     ),
+    _block("footer"),
 ]
 
 # Assets that get a cache-busting ?v=<hash> query string wherever the head

@@ -1,0 +1,921 @@
+/* ==========================================================================
+   Design tokens - the repeated values, named once.
+   ========================================================================== */
+:root {
+    --font-display: 'Oswald', sans-serif;
+    --font-body: 'Work Sans', sans-serif;
+    --red: #D44;                              /* brand red: h1 underline, section-3 */
+    --red-deep: #B22;                         /* darker red: CTA text, date badges */
+    --bar-bg: rgba(34, 34, 34, 0.75);         /* translucent bars over the banner photo */
+    --hairline: rgba(0, 0, 0, 0.12);          /* dividers on the light surface */
+    --card-bg: #ffffff;                       /* solid white card fill */
+    --kicker: #A11;                           /* small uppercase labels: deep red */
+    --surface: #F5F4F2;                       /* the single page background */
+    --link: #14477E;                          /* navy-blue for content links */
+    --link-hover: #0B2E54;                    /* deeper navy on hover/focus */
+    --measure: 42rem;                         /* readable text-column width, fixed unit
+                                                 (not ch: ch varies with font-size and
+                                                 misaligns blocks of different sizes) */
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background-color: var(--surface);
+}
+body {
+    font-family: var(--font-body);
+    margin: 2rem;
+    color: #1F1F1F;
+}
+
+/* Paragraph margins are opt-in. Deliberately a bare type selector (0,0,1) so
+   any single-class component rule can win; the old `.section p` version was
+   (0,1,1) and silently defeated every component's authored margins. */
+p {
+    margin: 0;
+}
+
+h2 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 0 0 1.5rem;
+}
+
+.bullet-list {
+    margin: 0 0 1.5rem;
+    padding-left: 1.5rem;
+    list-style: square;
+}
+.bullet-list li {
+    margin-bottom: 0.5rem;
+}
+
+/* Screen-reader-only text: conveys meaning that is visual-only otherwise. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ==========================================================================
+   Banner
+   ========================================================================== */
+.banner {
+    width: 100%;
+    min-height: 60vh;
+    position: relative;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('img/banner2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+}
+.banner h1 {
+    margin: auto;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 400;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.1;
+}
+.banner h1::after {
+    content: "";
+    display: block;
+    height: 6px;
+    background-color: var(--red);
+    margin-top: 1.5rem;
+}
+
+.banner-cta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    padding: 0.9rem 1rem;
+    background-color: var(--bar-bg);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.45);
+}
+/* .banner-cta-link styles live in the Buttons block further down, shared
+   with .form-btn - they must sit after the section link rules to win the
+   specificity tie against `.section-3 :where(a)`. */
+
+/* Home logo, pinned to the top-left over the nav bar. */
+.nav-home {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+}
+.nav-home:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+}
+.nav-logo {
+    display: block;
+    width: 32px;
+    height: 32px;
+}
+
+/* ==========================================================================
+   Navigation
+   ========================================================================== */
+#main-navbar {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    /* Left padding clears the absolutely-positioned .nav-home logo so the
+       centered, wrapping nav items never sit underneath it. */
+    padding: 0 3.5rem;
+    background-color: var(--bar-bg);
+}
+
+.nav-item {
+    flex: 0 0 auto;
+}
+
+.nav-link {
+    display: block;
+    padding: 1.25rem clamp(0.75rem, 1.2vw, 1.5rem);
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.05rem;
+    white-space: nowrap;
+}
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+.nav-link:focus-visible {
+    background-color: rgba(255, 255, 255, 0.12);
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+}
+.nav-link.active {
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: auto;
+    right: 0;
+    min-width: 160px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    /* more opaque than --bar-bg: menus overlap arbitrary page content */
+    background-color: rgba(34, 34, 34, 0.85);
+    z-index: 10;
+}
+.dropdown .nav-link {
+    padding: 0.75rem 1rem;
+    text-align: left;
+}
+
+.has-dropdown {
+    position: relative;
+}
+@media (hover: hover) {
+    .has-dropdown:hover .dropdown {
+        display: block;
+    }
+}
+.has-dropdown:focus-within > .dropdown,
+.has-dropdown.open > .dropdown {
+    display: block;
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+.section {
+    width: 100%;
+    padding: 3rem;
+}
+
+/* The whole page shares one surface. The section-N classes are kept as
+   markup hooks but no longer flood a background color - sections are now
+   separated by whitespace and a heading accent, which removes the light->dark
+   "false bottom" seam that stopped people scrolling. */
+.section-1,
+.section-2,
+.section-3 {
+    background-color: transparent;
+    color: inherit;
+}
+
+/* Home-page call to action. A subtle contained tinted panel (not a
+   full-width band) gives it emphasis without reintroducing a color seam. */
+.cta-section { text-align: center; }
+.cta-section .section-inner {
+    max-width: 640px;
+    padding: 2.5rem 2rem;
+    background-color: #F7ECEC;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.cta-section .banner-cta-link { margin-top: 1rem; }
+
+/* Short red underline under every section heading: the "a new section starts
+   here" signal that used to be carried by the color band, and it keeps brand
+   color in the page rhythm. */
+main h2 {
+    padding-bottom: 0.25rem;
+}
+main h2::after {
+    content: "";
+    display: block;
+    width: 3rem;
+    height: 3px;
+    margin: 0.75rem auto 0;
+    background-color: var(--red);
+}
+
+/* Constrains section content on wide screens for readability. */
+.section-inner {
+    max-width: 1100px;
+    margin-inline: auto;
+}
+.section-lead {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    margin: 2rem auto;
+}
+
+/* Text blocks hold a readable line length and stay centered under the
+   centered headings. Grids (.board-grid) keep the full container width. */
+.section-inner > p,
+.section-inner > .bullet-list {
+    max-width: var(--measure);
+    margin-inline: auto;
+}
+
+/* Content links: brand navy, with a modern underline that sits low, is set
+   thin and semi-transparent at rest, and firms up to a solid line on hover.
+   Kept at (0,0,2) so every classed link component (.form-btn, .banner-cta-link,
+   .doc-link, .contact-primary, .social-card a) still overrides it. Scoped to
+   `main` so the nav — which lives in .banner over the photo — is untouched. */
+main a {
+    color: var(--link);
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.18em;
+    text-decoration-skip-ink: auto;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+main a:hover,
+main a:focus-visible {
+    color: var(--link-hover);
+    text-decoration-color: currentColor;
+}
+
+/* ==========================================================================
+   Buttons - white pill on a colored background.
+   Placed after the section link rules on purpose: .form-btn ties them at
+   (0,1,0) and must come later in the file to win color/text-decoration.
+   ========================================================================== */
+.banner-cta-link,
+.form-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background-color: var(--red-deep);
+    color: #fff;
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.25;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.banner-cta-link {
+    padding: 0.75rem clamp(1rem, 2.5vw, 2rem);
+    font-size: clamp(1rem, 2.2vw, 1.5rem);
+}
+.form-btn {
+    padding: 0.75rem 2rem;
+    font-size: 1.25rem;
+}
+.banner-cta-link::after {
+    content: "\2192"; /* -> : internal navigation */
+    font-size: 1.6rem;
+    line-height: 1;
+    transition: transform 0.15s ease;
+}
+.form-btn::after {
+    content: "\2197"; /* NE arrow: leaves the site (external form) */
+    transition: transform 0.15s ease;
+}
+.banner-cta-link:hover, .form-btn:hover,
+.banner-cta-link:focus-visible, .form-btn:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.45);
+}
+.banner-cta-link:hover::after, .form-btn:hover::after,
+.banner-cta-link:focus-visible::after, .form-btn:focus-visible::after {
+    transform: translateX(4px);
+}
+/* Centers a button within the text column. */
+.btn-row {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* ==========================================================================
+   Cards - one grid, three card variants (board / sponsor / teacher).
+   ========================================================================== */
+.board-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Shared card shell. */
+.board-card,
+.sponsor-card,
+.teacher-card,
+.social-card {
+    background-color: var(--card-bg);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 3px solid var(--red);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    padding: 1.5rem 1.25rem;
+    text-align: center;
+}
+.teacher-card {
+    text-align: left;
+}
+.sponsor-card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Small uppercase label above a name. */
+.board-role,
+.teacher-grade {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.9rem;
+    color: var(--kicker);
+}
+
+/* Social platform cards: the whole card is one big external link. */
+.social-card a {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    text-decoration: none;
+}
+.social-card a::after {
+    content: " \2197"; /* NE arrow: leaves the site */
+    display: inline-block;
+    text-decoration: none;
+}
+.social-handle {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.95rem;
+    opacity: 0.85;
+}
+
+/* Impact stats: a few big numbers with a label under each. */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem auto 0;
+    padding: 0;
+    list-style: none;
+}
+.stat {
+    text-align: center;
+}
+.stat-number {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    line-height: 1;
+    color: var(--kicker);
+}
+.stat-label {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.board-name,
+.teacher-name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin: 0.25rem 0 0;
+}
+.teacher-name {
+    margin-bottom: 1rem;
+}
+
+.board-photo {
+    display: block;
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: rgba(0, 0, 0, 0.06);
+}
+.board-email {
+    display: inline-block;
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+    word-break: break-word;
+}
+
+.sponsor-logo {
+    display: block;
+    width: 100%;
+    height: 70px;
+    margin: 0 auto 1rem;
+    object-fit: contain; /* normalizes wildly different logo proportions */
+}
+.sponsor-name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+}
+
+/* ==========================================================================
+   Sponsor tiers - Golden / Silver / Bronze Eagles.
+   One labeled section per tier (highest first). Card size descends with the
+   tier, which is what signals the value ladder without ranking businesses.
+   ========================================================================== */
+
+/* Short metal accent under each tier heading. */
+.tier h2 {
+    padding-bottom: 0.25rem;
+}
+.tier h2::after {
+    content: "";
+    display: block;
+    width: 3rem;
+    height: 3px;
+    margin: 0.75rem auto 0;
+    border-radius: 2px;
+}
+.tier-gold h2::after   { background-color: #D9B44A; }
+.tier-silver h2::after { background-color: #B7C0C8; }
+.tier-bronze h2::after { background-color: #C08457; }
+
+.tier-blurb {
+    max-width: var(--measure);
+    margin: 0 auto 1rem;
+    text-align: center;
+}
+.tier-price {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+/* White chip: most business logos are drawn for a white background, so they
+   need one even on the dark section. Shared by tier-1 banners and tier-2. */
+.sponsor-logo-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+}
+/* Text fallback shown inside a chip until a real logo image is dropped in. */
+.sponsor-wordmark {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+}
+
+/* Tier 1 - Golden Eagles: full-width, business-provided banners, one per row. */
+.tier-gold-grid {
+    list-style: none;
+    margin: 1.5rem auto 0;
+    padding: 0;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.sponsor-banner {
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+/* Provided artwork should be 3:1 (~1200x400). object-fit: contain avoids
+   cropping any banner that isn't exactly that ratio; the white fill shows
+   only as slim bars. */
+.sponsor-banner img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 1;
+    object-fit: contain;
+    background-color: #fff;
+}
+/* Fallback when a Golden sponsor hasn't sent a banner yet. */
+.sponsor-banner-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 3 / 1;
+    padding: 1rem;
+    background-color: #fff;
+    color: var(--red-deep);
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 2.4rem);
+    text-align: center;
+}
+
+/* Tier 2 - Silver Eagles: medium logo cards, 2-3 per row. */
+.tier-silver-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.tier-silver-grid .sponsor-logo-chip {
+    height: 120px;
+    margin-bottom: 1rem;
+}
+/* Override the fixed 70px logo height so it fits the taller chip. */
+.tier-silver-grid .sponsor-logo {
+    height: auto;
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+    margin: 0;
+}
+
+/* Tier comparison table (Become a Sponsor). Wrapped in .table-scroll so a
+   4-column table scrolls sideways instead of breaking the layout on phones. */
+.table-scroll {
+    overflow-x: auto;
+    margin: 2rem auto 0;
+    max-width: 820px;
+}
+.tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.98rem;
+}
+.tier-table th,
+.tier-table td {
+    padding: 0.75rem 0.9rem;
+    text-align: center;
+    border-bottom: 1px solid var(--hairline);
+}
+.tier-table thead th {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 1.05rem;
+}
+.tier-table .tier-table-price {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+}
+/* Row labels down the left: normal weight, left aligned. */
+.tier-table tbody th {
+    text-align: left;
+    font-weight: 400;
+    white-space: nowrap;
+}
+.tier-table .yes {
+    font-size: 1.2rem;
+}
+
+.fav-list {
+    margin: 0;
+}
+.fav-list dt {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.75;
+    margin-top: 0.75rem;
+}
+.fav-list dd {
+    margin: 0.15rem 0 0;
+}
+
+/* Donation wishlist: one card per category (Coffee Bar, Holiday Shop, ...)
+   with a list of the items we're collecting. Reuses the .board-card shell but
+   left-aligns and adds a heading + item list. */
+.wishlist-card {
+    text-align: left;
+}
+.wishlist-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    margin: 0 0 0.75rem;
+}
+.wishlist-card ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    list-style: square;
+}
+.wishlist-card li {
+    margin-bottom: 0.35rem;
+}
+
+/* ==========================================================================
+   Row lists - documents (minutes, budget) and events share the shell.
+   ========================================================================== */
+.doc-list,
+.event-list {
+    max-width: var(--measure);
+    margin: 2rem auto 0;
+    padding: 0;
+    list-style: none;
+}
+.doc-item,
+.event-item {
+    border-bottom: 1px solid var(--hairline);
+}
+.doc-item:first-child,
+.event-item:first-child {
+    border-top: 1px solid var(--hairline);
+}
+
+/* Secondary line: dates, times, short notes. */
+.doc-meta,
+.event-meta,
+.sponsor-note {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+.doc-meta {
+    white-space: nowrap;
+}
+.event-meta {
+    margin-top: 0.3rem;
+}
+.sponsor-note {
+    margin-top: 0.5rem;
+}
+
+/* Row layout: title left, meta right. Shared by clickable and static rows. */
+.doc-link,
+.doc-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    padding: 1rem 0.75rem;
+    text-decoration: none;
+}
+/* Only the link variant is interactive (documents open elsewhere). */
+.doc-link:hover,
+.doc-link:focus-visible {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.doc-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+/* Same size/weight as .doc-title but for non-link rows (no underline, no
+   external-link arrow) - e.g. past fundraisers showing name + amount. */
+.doc-title-plain {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+}
+
+/* ↗ marks a link that leaves the site (documents, sponsor websites). */
+.doc-title::after,
+.sponsor-name a::after {
+    content: " \2197";
+    display: inline-block;
+    text-decoration: none;
+}
+
+/* Events: date badge beside the details. */
+.event-item {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.25rem 0.25rem;
+}
+.event-date {
+    flex: 0 0 auto;
+    width: 4rem;
+    padding: 0.5rem 0;
+    border-radius: 8px;
+    background-color: var(--red-deep);
+    color: #fff;
+    text-align: center;
+    font-family: var(--font-display);
+}
+.event-month {
+    display: block;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.event-day {
+    display: block;
+    font-size: 1.8rem;
+    line-height: 1.1;
+}
+.event-body {
+    min-width: 0; /* lets long text wrap instead of stretching the row */
+}
+.event-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+}
+.event-desc {
+    margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   Contact page
+   ========================================================================== */
+/* Catch-all address: sits on a light section, so it needs its own contrast
+   rather than the .section-2/.section-3 link rule. */
+.contact-primary {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: #A11;
+    text-decoration: none;
+    border-bottom: 2px solid #A11;
+    padding-bottom: 2px;
+    word-break: break-word;
+}
+.contact-primary:hover,
+.contact-primary:focus-visible {
+    color: #700;
+    border-bottom-color: #700;
+}
+
+/* ==========================================================================
+   Split section (home page: logo | intro)
+   ========================================================================== */
+.section-split {
+    display: flex;
+    width: 90%;
+    margin-inline: auto;
+}
+
+.split-left,
+.split-right {
+    flex: 0 0 50%;
+    min-width: 0;
+    padding: 2rem;
+}
+.split-left {
+    position: relative;
+    min-height: 20rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.split-left img {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+.split-right {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+}
+.split-right p + p {
+    margin-top: 1.5rem;
+}
+
+/* ==========================================================================
+   Media queries
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .banner-cta-link, .form-btn,
+    .banner-cta-link::after, .form-btn::after {
+        transition: none;
+    }
+    .banner-cta-link:hover, .form-btn:hover,
+    .banner-cta-link:focus-visible, .form-btn:focus-visible {
+        transform: none;
+    }
+    .banner-cta-link:hover::after, .form-btn:hover::after,
+    .banner-cta-link:focus-visible::after, .form-btn:focus-visible::after {
+        transform: none;
+    }
+}
+
+/* Tablets and small laptops: stack the split. Side by side below this width
+   squeezes the text column to ~28 characters per line. */
+@media (max-width: 1024px) {
+    .section-split {
+        flex-direction: column;
+    }
+    .split-left,
+    .split-right {
+        flex: 1 1 auto;
+    }
+    /* Stacked, the column is full width; cap it so the line length matches
+       the measure used elsewhere instead of running to ~85 characters. */
+    .split-right {
+        max-width: var(--measure);
+        margin-inline: auto;
+    }
+    .split-left img {
+        position: static;
+        max-height: none;
+        height: auto;
+    }
+}
+
+/* Narrow phones: a fixed-width date badge beside the text squeezes event
+   descriptions to ~20 characters. Lay the badge out as a pill above instead. */
+@media (max-width: 480px) {
+    .event-item {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .event-date {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.4rem;
+        width: auto;
+        align-self: flex-start;
+        padding: 0.35rem 0.75rem;
+    }
+    .event-day {
+        font-size: 1.25rem;
+    }
+}
+
+/* Phones: also reclaim the horizontal padding. At 375px the 80% width plus
+   three levels of padding left only ~150px of usable column. */
+@media (max-width: 768px) {
+    .section {
+        padding: 1.5rem;
+    }
+    .section-split {
+        width: 100%;
+    }
+    .split-left,
+    .split-right {
+        padding: 1rem;
+    }
+}

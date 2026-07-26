@@ -141,6 +141,47 @@ h2 {
     height: 32px;
 }
 
+/* Hamburger toggle: hidden on wide screens where the nav fits in one row
+   (see the max-width media query below), shown once it would otherwise wrap
+   onto several lines. */
+.nav-toggle {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 3;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 3.5rem;
+    height: 3.5rem;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+.nav-toggle:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+}
+.nav-toggle-bar {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: #fff;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+/* Morphs the three bars into an X while the menu is open. */
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+    opacity: 0;
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
 /* ==========================================================================
    Navigation
    ========================================================================== */
@@ -968,5 +1009,38 @@ main a:focus-visible {
     .split-left,
     .split-right {
         padding: 1rem;
+    }
+}
+
+/* Below this width the nav wraps onto several lines instead of fitting one
+   row, so collapse it behind the hamburger toggle instead. */
+@media (max-width: 860px) {
+    .nav-toggle {
+        display: flex;
+    }
+    #main-navbar {
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        /* Top padding clears the logo/toggle row (both absolutely positioned
+           at the same height) now that the menu stacks below them instead of
+           sharing their row. */
+        padding: 3.5rem 0 0;
+    }
+    #main-navbar.nav-open {
+        display: flex;
+    }
+    .nav-item {
+        width: 100%;
+    }
+    .nav-link {
+        padding: 1rem 1.5rem;
+    }
+    /* Dropdowns were absolutely positioned flyouts for the horizontal bar;
+       stacked, they should just flow inline under their parent item. */
+    .dropdown {
+        position: static;
+        width: 100%;
     }
 }

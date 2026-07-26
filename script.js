@@ -39,8 +39,32 @@ function initDropdowns() {
   });
 }
 
+// Hamburger toggle for the collapsed mobile nav (see the max-width: 860px
+// rule in style.css). The menu also auto-closes if the window is resized
+// past the breakpoint, so it can't be left open-but-hidden on desktop.
+function initNavToggle() {
+  var toggle = document.querySelector('.nav-toggle');
+  var navbar = document.getElementById('main-navbar');
+  if (!toggle || !navbar) return;
+
+  toggle.addEventListener('click', function () {
+    var isOpen = navbar.classList.toggle('nav-open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  var staysOpen = window.matchMedia('(min-width: 861px)');
+  staysOpen.addEventListener('change', function (e) {
+    if (e.matches) {
+      navbar.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initDropdowns);
+  document.addEventListener('DOMContentLoaded', initNavToggle);
 } else {
   initDropdowns();
+  initNavToggle();
 }

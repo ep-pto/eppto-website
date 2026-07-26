@@ -533,10 +533,10 @@ main a:focus-visible {
 
 .board-photo {
     display: block;
-    width: 96px;
-    height: 96px;
+    width: 140px;
+    height: 140px;
     margin: 0 auto 1rem;
-    border-radius: 50%;
+    border-radius: 18px;
     object-fit: cover;
     background-color: rgba(0, 0, 0, 0.06);
 }

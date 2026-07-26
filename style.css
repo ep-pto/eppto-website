@@ -387,6 +387,9 @@ main a:focus-visible {
 }
 .teacher-card {
     text-align: left;
+    /* Expanding one card's <details> shouldn't stretch its row-mates to
+       match - size each card to its own content instead of the grid row. */
+    align-self: start;
 }
 .sponsor-card {
     display: flex;
@@ -653,6 +656,41 @@ main a:focus-visible {
     margin: 0.15rem 0 0;
 }
 
+/* Teacher cards collapse to name + grade by default; .fav-toggle expands
+   the full <dl> of favorites. Native <details> keeps this keyboard- and
+   screen-reader-accessible without any JS. */
+.fav-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.85rem;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--red-deep);
+    cursor: pointer;
+    list-style: none;
+}
+.fav-toggle::-webkit-details-marker {
+    display: none;
+}
+.fav-toggle::before {
+    content: "\25B8"; /* right-pointing triangle */
+    display: inline-block;
+    transition: transform 0.15s ease;
+}
+.teacher-card details[open] .fav-toggle::before {
+    transform: rotate(90deg);
+}
+.teacher-card details[open] .fav-toggle {
+    margin-bottom: 0.25rem;
+}
+.fav-toggle:hover,
+.fav-toggle:focus-visible {
+    color: var(--red);
+}
+
 /* Donation wishlist: one card per category (Coffee Bar, Holiday Shop, ...)
    with a list of the items we're collecting. Reuses the .board-card shell but
    left-aligns and adds a heading + item list. */
@@ -782,6 +820,19 @@ main a:focus-visible {
 }
 .event-desc {
     margin-top: 0.5rem;
+}
+
+/* Wraps multiple .event-body blocks under one date badge so same-day events
+   stack vertically instead of competing for space in the flex row. */
+.event-body-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+}
+.event-body-group .event-body + .event-body {
+    padding-top: 1rem;
+    border-top: 1px solid var(--hairline);
 }
 
 /* ==========================================================================

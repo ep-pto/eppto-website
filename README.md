@@ -16,15 +16,16 @@ no framework, no server needed. Open any `.html` file in a browser to view it.
 | `volunteer.html` | Volunteer opportunities |
 | `sponsors.html` | Community sponsors, in Golden / Silver / Bronze Eagle tiers |
 | `donate.html` | Donate money (external link) and donate items (wishlist) |
+| `shop.html` | Popcorn Express subscription, monthly Spirit Shop balance, spirit wear |
 | `contact.html` | Catch-all email, board contacts, other ways to connect |
 | `social.html` | Social media links |
-| `favorites.html` | Teachers' favorite things (documents) |
+| `favorites.html` | Teachers' favorite things — its own top-level nav link, not under Documents |
 | `minutes.html` | Meeting minutes (documents) |
 | `budget.html` | Budget (documents) |
 | `bylaws.html` | Bylaws (documents) |
 | `_blocks.html` | **Source of truth for shared blocks.** Not a public page |
 | `style.css` | All styling for every page |
-| `script.js` | Dropdown menus (tap support on touch devices) |
+| `script.js` | Dropdown menus (tap support on touch devices) and the mobile hamburger nav toggle |
 | `sync-shared.py` | Copies shared blocks from `_blocks.html` into the pages |
 | `img/` | Images and favicon |
 
@@ -60,12 +61,34 @@ Current blocks:
 |---|---|---|
 | `head` | favicon, font links, `style.css`, `script.js` | every page |
 | `nav` | the whole navigation menu | every page |
-| `board` | the current board roster | `about.html`, `contact.html` |
+| `board` | current board roster, full (photo, bio, role, name, email) | `about.html` |
+| `board-compact` | the same roster, minus the photo and bio | `contact.html` |
 
-A page opts out of a block simply by not having its markers. The `board` block,
-for example, only has markers on `about.html` and `contact.html`; every other
-page omits them. The script reports pages without a given block's markers as
+A page opts out of a block simply by not having its markers. The `board`
+block, for example, only has markers on `about.html`; every other page
+omits them. The script reports pages without a given block's markers as
 "no markers", which is informational, not an error.
+
+**`board-compact` is a *derived* block, not markup of its own.** `about.html`'s
+cards need a photo and bio per board member; `contact.html` just wants a plain
+contact list. Rather than hand-maintain two roster copies that could drift, only
+`board` has real markup in `_blocks.html` — `board-compact` is defined in
+`sync-shared.py`'s `BLOCKS` list as "`board`, minus anything classed
+`board-photo`, `board-photo-placeholder`, or `board-bio`", and the script strips
+those elements (and any HTML comments) at sync time. There is exactly one place
+to edit a board member: the `board` block. `board`'s photo/bio are themselves
+placeholders (`.board-photo-placeholder`, "Bio coming soon.") until real ones
+exist — see `img/board/` and the commented-out `<img>` tag next to each person.
+
+A derived block is declared like this:
+
+```python
+Block("board-compact", source="board", strip_classes=["board-photo", "board-bio"])
+```
+
+`source` says which block's content to start from; `strip_classes` says what to
+remove. Everything else about it (its own `:start`/`:end` markers on whatever
+page uses it, showing up in `--check`, etc.) works exactly like a normal block.
 
 (There used to be a `cta` "Don't Miss Out" block on every page. It was removed:
 the call-to-action now lives only on the home page as its own section, so it is
@@ -117,6 +140,21 @@ can never end up with a stale or doubled highlight.
 2. Put the same markers where it should appear on each page
 3. Add the name to the `BLOCKS` list at the top of `sync-shared.py`
 
+### Adding a derived (subset) block
+
+Use this when a new page needs *most* of an existing block but should never
+show a couple of specific elements — the `board` / `board-compact` split above
+is the example to copy.
+
+1. Make sure the elements to exclude have a distinguishing class (add one if
+   they don't)
+2. Add a `Block(...)` to `BLOCKS` with `source` set to the base block's name
+   and `strip_classes` set to the classes to remove — no markers for it go in
+   `_blocks.html`, since it has no markup of its own
+3. Put that new block's own `:start`/`:end` markers on the page that should
+   get the subset (never the base block's markers there — those still render
+   the full version)
+
 ## Adding a new page
 
 1. Copy an existing page (`contact.html` is a good starting point)
@@ -161,9 +199,23 @@ The script writes the real content in on the next run.
 - `.section-inner` caps content at 1100px and centers it.
 - `.section-lead` is the larger intro paragraph.
 - `.bullet-list` is the square-bullet list style.
+- `.section-image` is a flyer/promo image dropped into a section's copy —
+  capped at the same `var(--measure)` width as body text, rounded corners,
+  card-style shadow. Used on `shop.html` for the Popcorn Express flyer
+  (`img/popcorn-express.webp`).
 - `.board-grid` / `.board-card` is a generic card grid (white card, hairline
-  border, red top accent) — not board-specific, and reused for sponsors and the
-  Silver/Bronze sponsor tiers.
+  border, red top accent) — not board-specific, and reused for sponsors, the
+  Silver/Bronze sponsor tiers, and teacher favorites.
+- `.teacher-card` (favorites.html) collapses to just grade + name by default,
+  with the full favorites `<dl>` behind a native `<details>`/`<summary>` toggle
+  (`.fav-toggle`) — no JS needed for the expand/collapse itself. Cards use
+  `align-self: start` so expanding one card doesn't stretch its row-mates to
+  match its height.
+- `.board-photo` / `.board-photo-placeholder` / `.board-bio` (about.html's
+  board cards only, via the `board` block — these are exactly the classes
+  `board-compact` strips out for contact.html) — a circular photo, a dashed
+  placeholder circle standing in for it until a real photo exists, and a short
+  bio line.
 - Buttons (`.banner-cta-link`, `.form-btn`) are filled red pills. In-content
   links (`main a`) are brand **navy** (`--link`) with a low, thin underline that
   firms up on hover; classed link components (buttons, `.contact-primary`,
@@ -198,23 +250,50 @@ The script writes the real content in on the next run.
   unfinished at a glance. Search for `PLACEHOLDER` to find them all.
 - **Dropdown menus** are anchored to the right edge of their parent so they
   open inward and can't run off the screen.
+- **Mobile nav.** Below 860px the horizontal nav bar (which would otherwise
+  wrap onto several lines) collapses behind a hamburger button (`.nav-toggle`
+  in the `nav` block, wired up by `initNavToggle` in `script.js`). It toggles
+  a `.nav-open` class on `#main-navbar` and auto-closes if the window is
+  resized back past the breakpoint. Dropdowns reuse the same open/close JS as
+  desktop touch devices — tapping a parent item expands it inline instead of
+  navigating.
 - **The split layout** on the home page stacks below 1024px. Side by side on
   narrower screens squeezed the text to ~28 characters per line.
 - **Typographic apostrophes** (`&rsquo;`) are used in visible text, not `'`.
 - **Images**: `banner2.jpg` is the banner. The home-page logo is served as WebP
   (`logo600.webp`, 134K) — resized down from a 1.9MB original. `logo32.png` is
   the small logo in the top-left of the nav bar, which links back to the home
-  page on every page.
+  page on every page. `popcorn-express.webp` is the Popcorn Express flyer on
+  `shop.html`, saved from the program's Cheddar Up page.
 
 ## Still to do
 
-- Replace the `PLACEHOLDER` emails in `_blocks.html` (board roster) and
-  `contact.html` (catch-all address), then run the sync script
-- Fill in the remaining `PLACEHOLDER` content: real event dates
-  (`events.html`), meeting schedule (`meetings.html`), sponsor names / logos /
-  banners (`sponsors.html`), the online-giving link and item categories on
-  `donate.html`, and the document links on `minutes.html`, `budget.html`, and
-  `bylaws.html`
-- Verify dropdown tap behavior on a real touch device
+- Replace the `PLACEHOLDER` catch-all address in `contact.html`
+- Fill in the remaining `PLACEHOLDER` content: real Google Drive links on
+  `budget.html` and `bylaws.html`, real document links on `minutes.html`
+  (currently `href="#"`), real fundraising numbers on `fundraisers.html`, and
+  the membership/volunteer signup form links on `membership.html` /
+  `volunteer.html`
+- `sponsors.html`: the Golden/Silver/Bronze tier sections are commented out
+  (see the comment block above "Become a Sponsor") until real sponsors are
+  signed on — only placeholder/example businesses existed, and the site is
+  publishing before that roster is filled in. Uncomment each tier as sponsors
+  come in, and remove the example businesses inside
+- `about.html`'s board cards: replace `.board-photo-placeholder` with the real
+  `<img class="board-photo">` (uncomment it, add the photo to `img/board/`)
+  and replace each "Bio coming soon." once bios are provided
+- `shop.html` has **two links that are not evergreen** — both point to a new
+  Cheddar Up page each month and need their `href` and button label updated
+  every month (each has a reminder comment above it in the HTML):
+  - the non-subscription popcorn purchase link (currently `august-popcorn-sale`,
+    "Buy August Popcorn (No Subscription)")
+  - the Monthly Spirit Shop link (currently `august-spirit-shop`, "Load August
+    Spirit Shop Balance")
+- Verify dropdown tap behavior and the mobile hamburger nav toggle on a real
+  touch device
 
-Every page linked from the nav now exists.
+The board roster (`_blocks.html`), event dates (`events.html`), meeting
+schedule (`meetings.html`), donate page (`donate.html`), shop page
+(`shop.html`), and teacher favorites (`favorites.html`, 41 staff entries) are
+filled in with real content. Every
+page linked from the nav now exists.

@@ -316,6 +316,19 @@ main h2::after {
     margin: 2rem auto;
 }
 
+/* A flyer or promo image dropped into a section's copy - e.g. the Popcorn
+   Express flyer on shop.html. Capped at the same measure as body text so it
+   doesn't run wider than the paragraphs around it. */
+.section-image {
+    display: block;
+    width: 100%;
+    max-width: var(--measure);
+    height: auto;
+    margin: 1.5rem auto;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
 /* Text blocks hold a readable line length and stay centered under the
    centered headings. Grids (.board-grid) keep the full container width. */
 .section-inner > p,
@@ -510,6 +523,16 @@ main a:focus-visible {
     border-radius: 50%;
     object-fit: cover;
     background-color: rgba(0, 0, 0, 0.06);
+}
+/* Reserves the photo's footprint before a real one exists, so the layout
+   doesn't shift once img/board/*.jpg files start replacing these. */
+.board-photo-placeholder {
+    border: 1px dashed rgba(0, 0, 0, 0.15);
+}
+.board-bio {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    opacity: 0.85;
 }
 .board-email {
     display: inline-block;

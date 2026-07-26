@@ -63,12 +63,13 @@
           <li><a href="social.html" class="nav-link">Social Media</a></li>
         </ul>
       </li>
+      <li class="nav-item"><a href="shop.html" class="nav-link">Shop</a></li>
       <li class="nav-item"><a href="donate.html" class="nav-link">Donate</a></li>
       <li class="nav-item"><a href="sponsors.html" class="nav-link">Community Sponsors</a></li>
+      <li class="nav-item"><a href="favorites.html" class="nav-link">Teacher&rsquo;s Favorite Things</a></li>
       <li class="nav-item has-dropdown">
         <a href="#" class="nav-link">Documents</a>
         <ul class="dropdown">
-          <li><a href="favorites.html" class="nav-link">Teacher&rsquo;s Favorite Things</a></li>
           <li><a href="minutes.html" class="nav-link">Meeting Minutes</a></li>
           <li><a href="budget.html" class="nav-link">Budget</a></li>
           <li><a href="bylaws.html" class="nav-link">Bylaws</a></li>
@@ -91,35 +92,69 @@
       </div>
     </section>
 
-    <!-- board roster: shared between about.html and contact.html -->
+    <!-- board roster: single source of truth for every board member.
+         about.html gets this whole block verbatim (board:start/end).
+         contact.html gets an auto-derived subset instead (board-compact,
+         defined in sync-shared.py's BLOCKS list) with the photo and bio
+         stripped out at sync time - there is nothing to hand-maintain for
+         the compact version, it always tracks this block.
+
+         Photo/bio are placeholders until the real ones are provided -
+         uncomment the <img> per person once a photo file exists in
+         img/board/, and replace the bio paragraph text. -->
     <section class="section section-2">
       <div class="section-inner">
         <h2>Board Roster Block</h2>
         <!-- board:start -->
         <ul class="board-grid">
           <li class="board-card">
+            <!-- Real photo (uncomment once available):
+            <img class="board-photo" src="img/board/megan-byczek.jpg" alt="Megan Byczek">
+            -->
+            <div class="board-photo board-photo-placeholder" aria-hidden="true"></div>
             <p class="board-role">President</p>
             <p class="board-name">Megan Byczek</p>
+            <p class="board-bio">Bio coming soon.</p>
             <a class="board-email" href="mailto:ptopresidentep@gmail.com">ptopresidentep@gmail.com</a>
           </li>
           <li class="board-card">
+            <!-- Real photo (uncomment once available):
+            <img class="board-photo" src="img/board/shelby-smith.jpg" alt="Shelby Smith">
+            -->
+            <div class="board-photo board-photo-placeholder" aria-hidden="true"></div>
             <p class="board-role">Vice President, Fundraising</p>
             <p class="board-name">Shelby Smith</p>
+            <p class="board-bio">Bio coming soon.</p>
             <a class="board-email" href="mailto:ptovpfundraisingep@gmail.com">ptovpfundraisingep@gmail.com</a>
           </li>
           <li class="board-card">
+            <!-- Real photo (uncomment once available):
+            <img class="board-photo" src="img/board/jenny-hohlman.jpg" alt="Jenny Hohlman">
+            -->
+            <div class="board-photo board-photo-placeholder" aria-hidden="true"></div>
             <p class="board-role">Vice President, Events</p>
             <p class="board-name">Jenny Hohlman</p>
+            <p class="board-bio">Bio coming soon.</p>
             <a class="board-email" href="mailto:ptovpeventsep@gmail.com">ptovpeventsep@gmail.com</a>
           </li>
           <li class="board-card">
+            <!-- Real photo (uncomment once available):
+            <img class="board-photo" src="img/board/alpa-magloire.jpg" alt="Alpa Magloire">
+            -->
+            <div class="board-photo board-photo-placeholder" aria-hidden="true"></div>
             <p class="board-role">Treasurer</p>
             <p class="board-name">Alpa Magloire</p>
+            <p class="board-bio">Bio coming soon.</p>
             <a class="board-email" href="mailto:ptotreasurerep@gmail.com">ptotreasurerep@gmail.com</a>
           </li>
           <li class="board-card">
+            <!-- Real photo (uncomment once available):
+            <img class="board-photo" src="img/board/kim-prazak.jpg" alt="Kim Prazak">
+            -->
+            <div class="board-photo board-photo-placeholder" aria-hidden="true"></div>
             <p class="board-role">Secretary</p>
             <p class="board-name">Kim Prazak</p>
+            <p class="board-bio">Bio coming soon.</p>
             <a class="board-email" href="mailto:sptosecretaryep@gmail.com">ptosecretaryep@gmail.com</a>
           </li>
         </ul>

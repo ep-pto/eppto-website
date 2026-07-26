@@ -15,6 +15,12 @@ a reminder.
 The nav block additionally gets its `active` class set per page, derived
 from each page's own filename, so no page can carry a stale highlight.
 
+A block can also be *derived*: instead of its own markup in _blocks.html,
+it's defined as another block with certain elements removed. `board-compact`
+is the board roster minus its photo and bio -- there's still only one place
+to edit a board member (the `board` block), and the compact copy on
+contact.html is generated from it automatically, never hand-duplicated.
+
 Usage:
     python3 sync-shared.py            sync every block
     python3 sync-shared.py --check    report what would change, write nothing
@@ -27,19 +33,48 @@ To add a shared block:
     1. wrap it in <!-- name:start --> / <!-- name:end --> in _blocks.html
     2. put the same markers where it should appear on each page
     3. add its name to BLOCKS below
+
+To add a derived (subset) block instead -- one whose content is always some
+other block minus a few tagged elements, so there's nothing extra to
+hand-maintain:
+    1. give the elements to exclude a distinguishing class, if they don't
+       already have one
+    2. add a Block(...) to BLOCKS with `source` set to the base block's name
+       and `strip_classes` set to the classes to remove
+    3. put that new block's own markers where the subset should appear
+       (never the base block's markers -- those still get the full version)
 """
 
 import re
 import sys
+from collections import namedtuple
 from pathlib import Path
 
 SOURCE = "_blocks.html"
 
+# name:           the block's own marker name, and what pages reference
+# does_active:    set the `active` class per destination page? (nav only)
+# source:         None for a normal block (content comes from its own
+#                 markers in _blocks.html); another block's name to derive
+#                 this one from that block's content instead
+# strip_classes:  when `source` is set, remove every element whose class
+#                 list contains any of these
+Block = namedtuple("Block", "name does_active source strip_classes")
+
+
+def _block(name, does_active=False, source=None, strip_classes=None):
+    return Block(name, does_active, source, strip_classes)
+
+
 BLOCKS = [
-    # block name, set the `active` class per destination page?
-    ("head", False),
-    ("nav", True),
-    ("board", False),
+    _block("head"),
+    _block("nav", does_active=True),
+    _block("board"),
+    _block(
+        "board-compact",
+        source="board",
+        strip_classes=["board-photo", "board-photo-placeholder", "board-bio"],
+    ),
 ]
 
 # When the current page is inside a dropdown, also mark its parent active.
@@ -49,8 +84,12 @@ ROOT = Path(__file__).parent
 ANCHOR_RE = re.compile(r"<a\b[^>]*>", re.IGNORECASE)
 HREF_RE = re.compile(r'href="([^"]*)"', re.IGNORECASE)
 CLASS_RE = re.compile(r'class="([^"]*)"', re.IGNORECASE)
-LI_OPEN_RE = re.compile(r"<li\b", re.IGNORECASE)
-LI_CLOSE_RE = re.compile(r"</li\s*>", re.IGNORECASE)
+TAG_WITH_CLASS_RE = re.compile(r'<(\w+)\b[^>]*\bclass="([^"]*)"[^>]*>', re.IGNORECASE)
+COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+
+# Elements with no closing tag - stripping one only needs to drop its own
+# <tag ...> match, never a matching close.
+VOID_TAGS = {"img", "br", "hr", "input", "meta", "link"}
 
 
 def notice(name):
@@ -78,11 +117,23 @@ def _matching_li_end(html, open_start):
     Tracks nesting, so a parent item containing a dropdown <ul> of <li>s
     returns its own closing tag rather than the first nested one.
     """
+    return _matching_tag_end(html, open_start, "li")
+
+
+def _matching_tag_end(html, open_start, tag):
+    """Index just past the closing tag matching the open tag at open_start.
+
+    Generic version of the li-matcher above: tracks nesting depth so an
+    element containing others of the same name returns its own close, not
+    the first nested one.
+    """
+    open_re = re.compile(r"<%s\b" % re.escape(tag), re.IGNORECASE)
+    close_re = re.compile(r"</%s\s*>" % re.escape(tag), re.IGNORECASE)
     depth = 0
     pos = open_start
     while pos < len(html):
-        nxt_open = LI_OPEN_RE.search(html, pos)
-        nxt_close = LI_CLOSE_RE.search(html, pos)
+        nxt_open = open_re.search(html, pos)
+        nxt_close = close_re.search(html, pos)
         if not nxt_close:
             return len(html)
         if nxt_open and nxt_open.start() < nxt_close.start():
@@ -94,6 +145,37 @@ def _matching_li_end(html, open_start):
             if depth == 0:
                 return pos
     return len(html)
+
+
+def strip_elements(html, classes):
+    """Remove every element whose class list intersects `classes`.
+
+    Also drops HTML comments entirely: the ones in practice sit right next
+    to a stripped element (e.g. "uncomment once available" next to a photo),
+    and make no sense to keep on a derived block that no longer has it.
+    """
+    html = COMMENT_RE.sub("", html)
+
+    out = []
+    pos = 0
+    while True:
+        m = TAG_WITH_CLASS_RE.search(html, pos)
+        if not m:
+            out.append(html[pos:])
+            break
+        out.append(html[pos : m.start()])
+        tag, tag_classes = m.group(1), m.group(2).split()
+        if any(c in tag_classes for c in classes):
+            end = m.end() if tag.lower() in VOID_TAGS else _matching_tag_end(
+                html, m.start(), tag
+            )
+            pos = end
+        else:
+            out.append(html[m.start() : m.end()])
+            pos = m.end()
+
+    # Collapse the blank line(s) a removed element leaves behind.
+    return re.sub(r"\n[ \t]*\n(?:[ \t]*\n)+", "\n\n", "".join(out))
 
 
 def set_active(block_html, page):
@@ -160,27 +242,33 @@ def destinations():
     return sorted(p for p in ROOT.glob("*.html") if not p.name.startswith("_"))
 
 
-def sync_block(name, does_active, check_only, source_html):
-    span = find_block(source_html, name)
+def sync_block(block, check_only, source_html):
+    # A derived block reads its content from another block's markers (its
+    # own name never appears in _blocks.html at all), then strips elements
+    # from it. A normal block just reads its own markers.
+    source_name = block.source or block.name
+    span = find_block(source_html, source_name)
     if span is None:
         return (
             ["[%s] ERROR: no %s:start/%s:end markers in %s"
-             % (name, name, name, SOURCE)],
+             % (block.name, source_name, source_name, SOURCE)],
             False,
         )
 
     template = source_html[span[0] : span[1]]
+    if block.strip_classes:
+        template = strip_elements(template, block.strip_classes)
     changed, same, skipped = [], [], []
 
     for page in destinations():
         html = page.read_text()
-        span = find_block(html, name)
+        span = find_block(html, block.name)
         if span is None:
             skipped.append(page.name)
             continue
 
-        content = set_active(template, page.name) if does_active else template
-        updated = html[: span[0]] + notice(name) + content + html[span[1] :]
+        content = set_active(template, page.name) if block.does_active else template
+        updated = html[: span[0]] + notice(block.name) + content + html[span[1] :]
 
         if updated == html:
             same.append(page.name)
@@ -189,7 +277,7 @@ def sync_block(name, does_active, check_only, source_html):
             if not check_only:
                 page.write_text(updated)
 
-    lines = ["[%s]" % name]
+    lines = ["[%s]" % block.name]
     verb = "would update" if check_only else "updated"
     if changed:
         lines.append("  %s: %s" % (verb, ", ".join(changed)))
@@ -208,7 +296,7 @@ def main():
     check_only = "--check" in sys.argv
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
 
-    known = {b[0] for b in BLOCKS}
+    known = {b.name for b in BLOCKS}
     wanted = args or sorted(known)
     unknown = [w for w in wanted if w not in known]
     if unknown:
@@ -224,10 +312,10 @@ def main():
 
     print("source: %s" % SOURCE)
     ok = True
-    for name, does_active in BLOCKS:
-        if name not in wanted:
+    for block in BLOCKS:
+        if block.name not in wanted:
             continue
-        lines, good = sync_block(name, does_active, check_only, source_html)
+        lines, good = sync_block(block, check_only, source_html)
         print("\n".join(lines))
         ok = ok and good
     return 0 if ok else 1

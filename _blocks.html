@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared Blocks &mdash; source of truth (not a public page)</title>
+  <!-- head:start -->
+  <link rel="icon" href="img/favicon.ico" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Work+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <!-- head:end -->
+</head>
+
+<!--
+  ============================================================
+  THIS FILE IS THE SOURCE OF TRUTH FOR SHARED BLOCKS.
+  It is not linked from the site and is not meant to be
+  published. The leading underscore marks it as a partial.
+
+  Edit a block here, then run:   python3 sync-shared.py
+  and every page carrying the same markers is updated.
+
+  You can open this file in a browser to preview the blocks
+  with the real site styling.
+  ============================================================
+-->
+
+<body>
+  <div class="banner">
+    <!-- nav:start -->
+    <a href="index.html" class="nav-home" aria-label="Home">
+      <img src="img/logo32.png" alt="Eagle Pointe PTO" class="nav-logo">
+    </a>
+    <nav aria-label="Main">
+    <ul id="main-navbar">
+      <li class="nav-item has-dropdown">
+        <a href="#" class="nav-link">Calendar</a>
+        <ul class="dropdown">
+          <li class="nav-item"><a href="events.html" class="nav-link">Upcoming Events</a></li>
+          <li class="nav-item"><a href="meetings.html" class="nav-link">PTO Meetings</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a href="fundraisers.html" class="nav-link">Fundraising Updates</a></li>
+      <li class="nav-item has-dropdown">
+        <a href="#" class="nav-link">Get Involved</a>
+        <ul class="dropdown">
+          <li><a href="membership.html" class="nav-link">Become a Member</a></li>
+          <li><a href="volunteer.html" class="nav-link">Volunteer</a></li>
+        </ul>
+      </li>
+      <li class="nav-item has-dropdown">
+        <a href="#" class="nav-link">Stay Connected</a>
+        <ul class="dropdown">
+          <li><a href="contact.html" class="nav-link">Contact Us</a></li>
+          <li><a href="social.html" class="nav-link">Social Media</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a href="donate.html" class="nav-link">Donate</a></li>
+      <li class="nav-item"><a href="sponsors.html" class="nav-link">Community Sponsors</a></li>
+      <li class="nav-item has-dropdown">
+        <a href="#" class="nav-link">Documents</a>
+        <ul class="dropdown">
+          <li><a href="favorites.html" class="nav-link">Teacher&rsquo;s Favorite Things</a></li>
+          <li><a href="minutes.html" class="nav-link">Meeting Minutes</a></li>
+          <li><a href="budget.html" class="nav-link">Budget</a></li>
+          <li><a href="bylaws.html" class="nav-link">Bylaws</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a href="about.html" class="nav-link">About Us</a></li>
+    </ul>
+    </nav>
+    <!-- nav:end -->
+    <h1>Shared Blocks</h1>
+  </div>
+
+  <main>
+    <!-- explanation (not a shared block) -->
+    <section class="section section-1">
+      <div class="section-inner">
+        <h2>Not a Public Page</h2>
+        <p class="section-lead">This file holds the canonical copy of every block that appears on more than one page. Edit a block here, then run <code>python3 sync-shared.py</code> to push it to every page that carries the matching markers. Do not edit those blocks on the pages themselves, because the script overwrites them.</p>
+        <p class="section-lead">The navigation above and the board roster below are the live blocks. They render with the real stylesheet, so this doubles as a preview.</p>
+      </div>
+    </section>
+
+    <!-- board roster: shared between about.html and contact.html -->
+    <section class="section section-2">
+      <div class="section-inner">
+        <h2>Board Roster Block</h2>
+        <!-- board:start -->
+        <ul class="board-grid">
+          <li class="board-card">
+            <p class="board-role">President</p>
+            <p class="board-name">Megan Byczek</p>
+            <a class="board-email" href="mailto:ptopresidentep@gmail.com">ptopresidentep@gmail.com</a>
+          </li>
+          <li class="board-card">
+            <p class="board-role">Vice President, Fundraising</p>
+            <p class="board-name">Shelby Smith</p>
+          </li>
+          <li class="board-card">
+            <p class="board-role">Vice President, Events</p>
+            <p class="board-name">Jenny Hohlman</p>
+          </li>
+          <li class="board-card">
+            <p class="board-role">Treasurer</p>
+            <p class="board-name">Alpa Magloire</p>
+            <a class="board-email" href="mailto:ptotreasurerep@gmail.com">ptotreasurerep@gmail.com</a>
+          </li>
+          <li class="board-card">
+            <p class="board-role">Secretary</p>
+            <p class="board-name">Kim Prazak</p>
+            <a class="board-email" href="mailto:sptosecretaryep@gmail.com">ptosecretaryep@gmail.com</a>
+          </li>
+        </ul>
+        <!-- board:end -->
+      </div>
+    </section>
+  </main>
+</body>
+</html>

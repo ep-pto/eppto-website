@@ -82,7 +82,7 @@ h2 {
     width: 100%;
     min-height: 60vh;
     position: relative;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('img/banner2.jpg');
+    background-image: url('img/banner2.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -98,6 +98,7 @@ h2 {
     text-transform: uppercase;
     text-align: center;
     line-height: 1.1;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65), 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 .banner h1::after {
     content: "";
@@ -867,7 +868,8 @@ main a:focus-visible {
 
 /* ↗ marks a link that leaves the site (documents, sponsor websites). */
 .doc-title::after,
-.sponsor-name a::after {
+.sponsor-name a::after,
+.ext-link::after {
     content: " \2197";
     display: inline-block;
     text-decoration: none;
@@ -927,22 +929,38 @@ main a:focus-visible {
 /* ==========================================================================
    Contact page
    ========================================================================== */
-/* Catch-all address: sits on a light section, so it needs its own contrast
-   rather than the .section-2/.section-3 link rule. */
+/* Catch-all address: centered and set off from the surrounding prose so
+   it reads as the page's primary action, not another line of text. */
+.contact-primary-block {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+.contact-label {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.9rem;
+    color: var(--kicker);
+    margin-bottom: 0.5rem;
+}
 .contact-primary {
     display: inline-block;
     font-family: var(--font-display);
-    font-size: 1.4rem;
-    color: #A11;
+    font-size: 1.3rem;
+    color: #fff;
+    background-color: #A11;
     text-decoration: none;
-    border-bottom: 2px solid #A11;
-    padding-bottom: 2px;
+    border-radius: 999px;
+    padding: 0.75rem 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
     word-break: break-word;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 .contact-primary:hover,
 .contact-primary:focus-visible {
-    color: #700;
-    border-bottom-color: #700;
+    background-color: #700;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.45);
 }
 
 /* ==========================================================================

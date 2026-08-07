@@ -243,6 +243,18 @@ The script writes the real content in on the next run.
   `.tier-silver` medium logo cards, `.tier-bronze` name tiles, each with a
   gold / silver / bronze heading underline. Styles live in the "Sponsor tiers"
   block of `style.css`.
+  - **Gold banner artwork should be 1200x400px (3:1)** — ask each Golden Eagle
+    sponsor for this when they sign on. `object-fit: contain` keeps an
+    off-ratio image from being cropped (it just letterboxes on white), so a
+    wrong size won't break the layout, but 1200x400 is what fills the tile
+    edge-to-edge. Until a sponsor sends artwork, use `.sponsor-banner-fallback`
+    (business name on a plain white tile) as a placeholder — see the Irina
+    Bordian tile for the pattern.
+  - Each Gold tile can also carry a short `.sponsor-info` blurb and, if the
+    business has one, a `.sponsor-social` icon row (Facebook/Instagram SVGs
+    copied from the `social` block's icons) — see the Yard Signs Design and
+    Irina Bordian tiles for the pattern. Both are optional; the banner and
+    website link are the only required parts.
 
 ## Conventions worth keeping
 
@@ -300,11 +312,11 @@ The script writes the real content in on the next run.
   (currently `href="#"`), real fundraising numbers on `fundraisers.html`, and
   the membership/volunteer signup form links on `membership.html` /
   `volunteer.html`
-- `sponsors.html`: the Golden/Silver/Bronze tier sections are commented out
-  (see the comment block above "Become a Sponsor") until real sponsors are
-  signed on — only placeholder/example businesses existed, and the site is
-  publishing before that roster is filled in. Uncomment each tier as sponsors
-  come in, and remove the example businesses inside
+- `sponsors.html`: the Golden Eagles tier is live with real sponsors (Irina
+  Bordian/REMAX, Yard Signs Design). Silver/Bronze are still commented out
+  (see the comment block above "Become a Sponsor") with only placeholder/
+  example businesses inside — uncomment each as real sponsors sign on for
+  those tiers, and remove the example businesses
 - `about.html`'s board cards: replace `.board-photo-placeholder` with the real
   `<img class="board-photo">` (uncomment it, add the photo to `img/board/`)
   and replace each "Bio coming soon." once bios are provided

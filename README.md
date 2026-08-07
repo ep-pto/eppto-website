@@ -248,85 +248,23 @@ The script writes the real content in on the next run.
     off-ratio image from being cropped (it just letterboxes on white), so a
     wrong size won't break the layout, but 1200x400 is what fills the tile
     edge-to-edge. Until a sponsor sends artwork, use `.sponsor-banner-fallback`
-    (business name on a plain white tile) as a placeholder — see the Irina
-    Bordian tile for the pattern.
+    (business name on a plain white tile) as a placeholder — see
+    `.sponsor-card-placeholder` below for the currently-commented-out example.
   - Each Gold tile can also carry a short `.sponsor-info` blurb and, if the
     business has one, a `.sponsor-social` icon row (Facebook/Instagram SVGs
-    copied from the `social` block's icons) — see the Yard Signs Design and
-    Irina Bordian tiles for the pattern. Both are optional; the banner and
-    website link are the only required parts.
-
-## Conventions worth keeping
-
-- **Design tokens.** Repeated values (brand reds, the `--surface` page color,
-  the `--link` / `--link-hover` navy for content links, card/hairline/kicker
-  colors, the `--font-display` Oswald and `--font-body` Work Sans stacks, the
-  `42rem` text measure) live as CSS custom properties in the `:root` block at
-  the top of `style.css`. Change them there, not at each use site.
-- **Paragraph margins are opt-in.** A bare `p { margin: 0 }` reset (kept
-  deliberately at type-selector specificity) zeroes everything; components
-  add back the margins they want. Don't raise that reset's specificity (e.g.
-  to `.section p`) — a higher-specificity version of it will defeat every
-  component's own spacing.
-- **Text measure.** Paragraphs and lists inside `.section-inner` are capped at
-  `var(--measure)` (42rem) and centered. This is a fixed unit on purpose:
-  `ch` scales with font-size, which made blocks of different sizes misalign.
-- **Placeholder emails** use `example.org`. It is the reserved placeholder
-  domain, so it can never reach a real inbox by accident and is obviously
-  unfinished at a glance. Search for `PLACEHOLDER` to find them all.
-- **Dropdown menus** are anchored to the right edge of their parent so they
-  open inward and can't run off the screen.
-- **Mobile nav.** Below 860px the horizontal nav bar (which would otherwise
-  wrap onto several lines) collapses behind a hamburger button (`.nav-toggle`
-  in the `nav` block, wired up by `initNavToggle` in `script.js`). It toggles
-  a `.nav-open` class on `#main-navbar` and auto-closes if the window is
-  resized back past the breakpoint. Dropdowns reuse the same open/close JS as
-  desktop touch devices — tapping a parent item expands it inline instead of
-  navigating.
-- **Dated buttons.** A `.form-btn` with a `data-cutoff="YYYY-MM-DDTHH:MM:SS"`
-  attribute (local time) auto-disables itself once that time passes —
-  `initDatedButtons()` in `script.js` checks once on page load, and if the
-  button is past its cutoff it strips the `href`/`target`, sets
-  `aria-disabled="true"` (greyed out, inert, "Closed" label via
-  `.form-btn[aria-disabled="true"]::after` in `style.css`), and updates its
-  hidden "(opens in a new tab)" text to "(closed)". Used on `shop.html`'s
-  three time-boxed links (Popcorn Express subscription, the monthly
-  non-subscription popcorn sale, the monthly Spirit Shop balance) — buttons
-  with no `data-cutoff`, like Spirit Wear, are left alone. Update the cutoff
-  alongside the `href` each time one of these monthly links changes; there's
-  nothing else to touch.
-- **The split layout** on the home page stacks below 1024px. Side by side on
-  narrower screens squeezed the text to ~28 characters per line.
-- **Typographic apostrophes** (`&rsquo;`) are used in visible text, not `'`.
-- **Images**: `banner2.jpg` is the banner. The home-page logo is served as WebP
-  (`logo600.webp`, 134K) — resized down from a 1.9MB original. `logo32.png` is
-  the small logo in the top-left of the nav bar, which links back to the home
-  page on every page. `popcorn-express.webp` is the Popcorn Express flyer on
-  `shop.html`, saved from the program's Cheddar Up page.
-
-## Still to do
-
-- Replace the `PLACEHOLDER` catch-all address in `contact.html`
-- Fill in the remaining `PLACEHOLDER` content: real Google Drive links on
-  `budget.html` and `bylaws.html`, real document links on `minutes.html`
-  (currently `href="#"`), real fundraising numbers on `fundraisers.html`, and
-  the membership/volunteer signup form links on `membership.html` /
-  `volunteer.html`
-- `sponsors.html`: the Golden Eagles tier is live with real sponsors (Irina
-  Bordian/REMAX, Yard Signs Design). Silver/Bronze are still commented out
-  (see the comment block above "Become a Sponsor") with only placeholder/
-  example businesses inside — uncomment each as real sponsors sign on for
-  those tiers, and remove the example businesses
-- `about.html`'s board cards: replace `.board-photo-placeholder` with the real
-  `<img class="board-photo">` (uncomment it, add the photo to `img/board/`)
-  and replace each "Bio coming soon." once bios are provided
-- `shop.html` has **two links that are not evergreen** — both point to a new
-  Cheddar Up page each month and need their `href`, button label, and
-  `data-cutoff` updated every month (each has a reminder comment above it in
-  the HTML; see "Dated buttons" above for what `data-cutoff` does):
-  - the non-subscription popcorn purchase link (currently `august-popcorn-sale`,
-    "Buy August Popcorn (No Subscription)", cutoff Aug 27 10:00 AM)
-  - the Monthly Spirit Shop link (currently `august-spirit-shop`, "Load August
-    Spirit Shop Balance", cutoff Aug 28 10:00 AM)
-- Verify dropdown tap behavior and the mobile hamburger nav toggle on a real
-  touch device
+    copied from the `social` block's icons) — see any live Gold tile for the
+    pattern. Both are optional; the banner and website link are the only
+    required parts.
+  - **`.sponsor-card-placeholder`** is a billboard-style "this spot is open"
+    card standing in for a tier with no sponsor — dashed border instead of
+    the solid red/shadow card treatment, a `.sponsor-placeholder-name` line,
+    and a price + link to `#become-a-sponsor` (the id on the pricing table's
+    `<section>`). Live right now on Silver and Bronze (each tier's only
+    `<li>`); Gold's version is commented out directly above "Become a
+    Sponsor" in `sponsors.html` since all three Gold spots are currently
+    filled — restore it if a Gold sponsor lapses. Width is tier-specific:
+    Silver `max-width: 50%`, Bronze `max-width: 20%` (Gold implicitly 100%,
+    it's just the full-width banner column) — see the "Tile widths follow
+    the tier hierarchy" comment in `style.css` for why `width: 100%` is also
+    needed alongside `max-width` (grid `justify-self: center` otherwise
+    shrinks the card to fit its text instead of claiming its intended size).

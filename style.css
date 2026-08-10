@@ -462,6 +462,11 @@ main a:focus-visible {
        match - size each card to its own content instead of the grid row. */
     align-self: start;
 }
+/* Board cards keep their centered layout (unlike teacher-card), but need
+   the same align-self fix once their bio becomes an expandable <details>. */
+.board-card {
+    align-self: start;
+}
 .sponsor-card {
     display: flex;
     flex-direction: column;
@@ -554,11 +559,6 @@ main a:focus-visible {
    doesn't shift once img/board/*.jpg files start replacing these. */
 .board-photo-placeholder {
     border: 1px dashed rgba(0, 0, 0, 0.15);
-}
-.board-bio {
-    margin-top: 0.5rem;
-    font-size: 0.95rem;
-    opacity: 0.85;
 }
 .board-email {
     display: inline-block;
@@ -861,11 +861,20 @@ main a:focus-visible {
     display: inline-block;
     transition: transform 0.15s ease;
 }
-.teacher-card details[open] .fav-toggle::before {
+.teacher-card details[open] .fav-toggle::before,
+.board-card details[open] .fav-toggle::before {
     transform: rotate(90deg);
 }
-.teacher-card details[open] .fav-toggle {
+.teacher-card details[open] .fav-toggle,
+.board-card details[open] .fav-toggle {
     margin-bottom: 0.25rem;
+}
+/* Board bio text: matches .board-bio's old plain-paragraph spacing now that
+   it sits inside the <details> instead of being the bio itself. */
+.board-bio-text {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    opacity: 0.85;
 }
 .fav-toggle:hover,
 .fav-toggle:focus-visible {
@@ -905,6 +914,12 @@ main a:focus-visible {
 .doc-item,
 .event-item {
     border-bottom: 1px solid var(--hairline);
+}
+/* Set by initPastEvents() in script.js once an event's date has passed -
+   same 0.55 opacity as the expired-link .form-btn state, for one consistent
+   "this has passed" visual language across the site. */
+.event-item.is-past {
+    opacity: 0.55;
 }
 .doc-item:first-child,
 .event-item:first-child {

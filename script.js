@@ -81,6 +81,24 @@ function initDatedButtons() {
   });
 }
 
+// Mutes calendar entries whose date has already passed - applies wherever
+// the .event-item / .event-date[datetime] pattern is used (events.html,
+// meetings.html, community.html), no per-page wiring needed. Date-only
+// comparison (local midnight) so today's events are never marked past, and
+// an .event-item shared by several same-day entries (.event-body-group)
+// mutes as one unit since they share a single date.
+function initPastEvents() {
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+  document.querySelectorAll('.event-item').forEach(function (item) {
+    var time = item.querySelector('.event-date[datetime]');
+    if (!time) return;
+    var eventDate = new Date(time.getAttribute('datetime') + 'T00:00:00');
+    if (isNaN(eventDate) || eventDate >= today) return;
+    item.classList.add('is-past');
+  });
+}
+
 // Keeps the footer's copyright year current without anyone having to edit
 // it every January.
 function initFooterYear() {
@@ -92,10 +110,12 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initDropdowns);
   document.addEventListener('DOMContentLoaded', initNavToggle);
   document.addEventListener('DOMContentLoaded', initDatedButtons);
+  document.addEventListener('DOMContentLoaded', initPastEvents);
   document.addEventListener('DOMContentLoaded', initFooterYear);
 } else {
   initDropdowns();
   initNavToggle();
   initDatedButtons();
+  initPastEvents();
   initFooterYear();
 }

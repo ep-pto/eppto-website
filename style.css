@@ -291,6 +291,21 @@ h2 {
 }
 .cta-section .banner-cta-link { margin-top: 1rem; }
 
+/* Contained tinted panel for one piece of information we don't want people to
+   scroll past - e.g. the childcare offer on meetings.html. Same treatment as
+   the home CTA, but it carries real body copy, so the heading stays centered
+   (with its red underline) while the text below it reads left-aligned.
+   Sized to the text measure plus its own padding. */
+.callout-section .section-inner {
+    max-width: calc(var(--measure) + 4rem);
+    padding: 2.5rem 2rem;
+    background-color: #F7ECEC;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.callout-section .section-inner > :last-child { margin-bottom: 0; }
+
 /* Short red underline under every section heading: the "a new section starts
    here" signal that used to be carried by the color band, and it keeps brand
    color in the page rhythm. */
@@ -658,30 +673,34 @@ main a:focus-visible {
     border-radius: 10px;
     box-shadow: none;
 }
-/* Tile widths follow the tier hierarchy: Gold tiles already span the full
-   row (100%); Silver is half that, Bronze a fifth. min-width keeps them
-   from shrinking to unreadable slivers on narrow screens - the percentage
-   only takes over once the container is wide enough for it to matter. */
-.tier-silver-grid .sponsor-card-placeholder {
-    max-width: 50%;
-    min-width: 260px;
-}
-.board-grid .sponsor-card-placeholder {
-    max-width: 20%;
-    min-width: 220px;
-}
+/* Tile widths follow the tier hierarchy, and the cap belongs on the grid
+   TRACK rather than on the card: auto-fit hands a lone item the entire row,
+   so a tier holding exactly one sponsor would otherwise stretch it full
+   width and flatten the value ladder. Capping the track means one Gold spans
+   the row, one Silver stays half-width, one Bronze stays a fifth - the same
+   size they'd be with siblings beside them. The minmax lower bound keeps
+   tiles from shrinking to unreadable slivers on narrow screens; the fixed
+   upper bound is what stops the stretch.
+
+   The caps are read as "how many fit across a full row": Gold 1, Silver 2,
+   Bronze 3 - roughly 100% / 50% / 33% of the 1100px row, all measured
+   against the same thing. The numbers below are that row width minus the
+   1.5rem gaps, divided by the count. See .tier-silver-grid and
+   .tier-bronze-grid. */
 .sponsor-placeholder-name {
     font-family: var(--font-display);
     font-size: 1.25rem;
     color: var(--kicker);
 }
 
-/* Tier 1 - Golden Eagles: full-width, business-provided banners, one per row. */
+/* Tier 1 - Golden Eagles: full-width, business-provided banners, one per row.
+   No max-width: the tile spans the whole 1100px row, so Gold really is the
+   100% the tier ladder claims. Banners are contained (not cropped), so a
+   sponsor's 3:1 artwork just renders larger here. */
 .tier-gold-grid {
     list-style: none;
     margin: 1.5rem auto 0;
     padding: 0;
-    max-width: 900px;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -766,7 +785,21 @@ main a:focus-visible {
 /* Tier 2 - Silver Eagles: medium logo cards, 2-3 per row. */
 .tier-silver-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 538px));
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Tier 3 - Bronze Eagles: the smallest tile, 3 per row. Its own grid rather
+   than .board-grid (the board roster's 300px-minimum grid), which is shared
+   with five other pages and is far too wide for this tier. */
+.tier-bronze-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 351px));
+    justify-content: center;
     gap: 1.5rem;
     margin: 1.5rem 0 0;
     padding: 0;

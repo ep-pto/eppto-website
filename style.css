@@ -1041,6 +1041,15 @@ main a:focus-visible {
     font-size: 1.8rem;
     line-height: 1.1;
 }
+/* Date ranges ("23-27", "1-31") are too wide for the 4rem badge at the full
+   1.8rem and wrap mid-range. Shrink just those and hold them on one line -
+   the badge keeps its width, so every row's body still starts at the same
+   left edge and single-day numerals are untouched. */
+.event-day-range {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    white-space: nowrap;
+}
 .event-body {
     min-width: 0; /* lets long text wrap instead of stretching the row */
 }
